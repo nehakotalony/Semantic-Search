@@ -1,0 +1,23 @@
+# Web framework
+Flask==3.0.3
+
+# Cross-Origin Resource Sharing (so frontend can call Flask API)
+Flask-Cors==4.0.1
+
+# HTTP requests to PubMed (if you fetch from backend)
+requests==2.31.0
+
+# Hugging Face Transformers (for AI summarization)
+transformers==4.44.2
+torch==2.3.1       # Required for PyTorch backend
+sentencepiece==0.2.0
+safetensors==0.4.4
+
+# Optional: If you want to use NLTK for preprocessing / synonym expansion
+nltk==3.9.1
+
+# If using scikit-learn for semantic similarity
+scikit-learn==1.5.1
+
+# Environment variables support
+python-dotenv==1.0.1

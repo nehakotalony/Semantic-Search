@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PubMed Semantic Search - Advanced Medical Literature Discovery</title>
+    <meta name="description" content="Advanced semantic search for PubMed articles with enhanced precision and intelligent query processing">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Enhanced favicon with medical theme -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%232563eb'/><path d='M30 50h40M50 30v40' stroke='white' stroke-width='6' stroke-linecap='round'/></svg>">
+</head>
+<body>
+    <!-- Redesigned header section with v0.dev-style centered layout -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">What medical research do you want to find?</h1>
+                <p class="hero-description">Discover medical literature with advanced semantic search. Find relevant research beyond exact keyword matches.</p>
+                
+                <!-- Centered search bar with v0.dev styling -->
+                <div class="search-container">
+                    <form class="search-form" id="searchForm">
+                        <div class="search-input-group">
+                            <input 
+                                type="text" 
+                                class="search-input" 
+                                id="searchQuery"
+                                placeholder="Search for medical research (e.g., 'COVID-19 vaccine efficacy', 'machine learning diagnosis')"
+                                autocomplete="off"
+                                required
+                            >
+                            <!-- Added search recommendations dropdown -->
+                            <div class="search-recommendations" id="searchRecommendations" style="display: none;">
+                                <div class="recommendations-header">
+                                    <span>Popular searches</span>
+                                </div>
+                                <div class="recommendations-list" id="recommendationsList">
+                                    <!-- Recommendations will be populated here -->
+                                </div>
+                            </div>
+                            <button type="submit" class="search-button">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Compact semantic controls positioned below search -->
+                        <div class="semantic-controls">
+                            <div class="slider-control">
+                                <label class="slider-label">Max results: <span class="slider-value" id="maxResultsValue">20</span></label>
+                                <input type="range" class="slider" id="maxResultsSlider" min="10" max="200" value="20" step="10">
+                            </div>
+                            
+                            <div class="slider-control">
+                                <label class="slider-label">Top semantic: <span class="slider-value" id="topKValue">5</span></label>
+                                <input type="range" class="slider" id="topKSlider" min="1" max="20" value="5" step="1">
+                            </div>
+                        </div>
+                        
+                        <!-- Collapsible filters with toggle button -->
+                        <div class="filters-container">
+                            <button type="button" class="filters-toggle" id="filtersToggle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                </svg>
+                                Advanced Filters
+                                <svg class="filter-icon" id="filterIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            
+                            <div class="filters-content" id="filtersContent">
+                                <div class="filter-group">
+                                    <label class="filter-label" for="searchField">Search Field</label>
+                                    <select class="filter-select" id="searchField">
+                                        <option value="all">All Fields</option>
+                                        <option value="title">Title</option>
+                                        <option value="abstract">Abstract</option>
+                                        <option value="author">Author</option>
+                                        <option value="journal">Journal</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label" for="publicationType">Publication Type</label>
+                                    <select class="filter-select" id="publicationType">
+                                        <option value="">All Types</option>
+                                        <option value="clinical trial">Clinical Trial</option>
+                                        <option value="meta-analysis">Meta-Analysis</option>
+                                        <option value="review">Review</option>
+                                        <option value="case reports">Case Reports</option>
+                                        <option value="randomized controlled trial">RCT</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label" for="dateFrom">Date From</label>
+                                    <input type="date" class="filter-input" id="dateFrom">
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label" for="dateTo">Date To</label>
+                                    <input type="date" class="filter-input" id="dateTo">
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label" for="language">Language</label>
+                                    <select class="filter-select" id="language">
+                                        <option value="">All Languages</option>
+                                        <option value="eng">English</option>
+                                        <option value="spa">Spanish</option>
+                                        <option value="fre">French</option>
+                                        <option value="ger">German</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="filter-actions">
+                                    <button type="button" class="btn btn-secondary" id="clearBtn">Clear Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced loading section with medical theme -->
+    <section class="loading" id="loadingSection">
+        <div class="container">
+            <div class="spinner"></div>
+            <p>Searching PubMed database with semantic analysis...</p>
+        </div>
+    </section>
+
+    <!-- Enhanced results section -->
+    <section class="results-section" id="resultsSection" style="display: none;">
+        <div class="container">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">
+                    Found 0 medical articles
+                </div>
+                <div class="sort-controls">
+                    <label class="sort-label" for="sortBy">Sort by:</label>
+                    <select class="filter-select" id="sortBy">
+                        <option value="relevance">Relevance</option>
+                        <option value="date">Publication Date</option>
+                        <option value="author">First Author</option>
+                        <option value="journal">Journal</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="articles-grid" id="articlesGrid">
+                <!-- Articles will be populated here with enhanced styling -->
+            </div>
+            
+            <div class="pagination" id="pagination">
+                <!-- Enhanced pagination will be populated here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced error message -->
+    <div class="error-message" id="errorMessage" style="display: none;">
+        <div class="container">
+            <p id="errorText"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

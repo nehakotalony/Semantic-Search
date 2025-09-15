@@ -22,11 +22,20 @@ jobs:
           service_account_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
           export_default_credentials: true
 
+      - name: Debug: Verify Project ID
+        run: |
+          if [ -z "${{ secrets.GCLOUD_PROJECT }}" ]; then
+            echo "❌ ERROR: GCLOUD_PROJECT secret is empty!"
+            echo "Go to GitHub Settings > Secrets > Actions and set GCLOUD_PROJECT to your GCP Project ID (e.g., semantic-search-app-123456)"
+            exit 1
+          fi
+          echo "✅ Using Project ID: ${{ secrets.GCLOUD_PROJECT }}"
+
       - name: Build Docker image
         run: |
           docker build -t gcr.io/${{ secrets.GCLOUD_PROJECT }}/semantic-search .
 
-      - name: Push to Container Registry
+      - name: Push to Google Container Registry
         run: |
           docker push gcr.io/${{ secrets.GCLOUD_PROJECT }}/semantic-search
 

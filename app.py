@@ -1,12 +1,16 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from semantic import rank_results
 from pubmed_client import search_pubmed, fetch_abstracts
 from utils import expand_query_with_synonyms
-from summarizer import generate_summary   # <-- Hugging Face summarizer
+from summarizer import generate_summary   # Hugging Face summarizer
 
-app = Flask(__name__)
+app = Flask(name, template_folder="templates", static_folder="static")
 CORS(app)
+
+@app.route("/")
+def home():
+    return render_template("index.html")   # This will load your frontend
 
 @app.route("/api/health")
 def health():
@@ -22,7 +26,7 @@ def search():
         return jsonify({"error": "Query is required"}), 400
 
     try:
-        # 1. Expand query with synonyms + truncation + MeSH
+        # 1. Expand query with synonyms
         expanded_query = expand_query_with_synonyms(query)
 
         # 2. PubMed search
@@ -42,5 +46,5 @@ def search():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
+if name == "main":
     app.run(host="0.0.0.0", port=5000, debug=True)

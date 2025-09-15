@@ -11,7 +11,7 @@ tokenizers==0.19.1
 transformers==4.44.2
 
 # Torch pinned to prebuilt CPU wheel
-torch==2.3.1+cpu
+torch==2.3.1
 
 # Higher-level NLP
 sentence-transformers==2.7.0

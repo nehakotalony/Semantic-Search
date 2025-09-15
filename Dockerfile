@@ -7,8 +7,10 @@ WORKDIR /app
 # Copy requirements first (for caching)
 COPY requirements.txt .
  
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install PyTorch CPU version from official source + upgrade pip
+RUN pip install --upgrade pip && \
+    pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt
  
 # Copy everything else
 COPY . .

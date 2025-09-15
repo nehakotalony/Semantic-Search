@@ -9,9 +9,11 @@ requests==2.31.0
 
 # Hugging Face Transformers (for AI summarization)
 transformers==4.44.2
-torch==2.3.1       # Required for PyTorch backend
+torch>=2.3.0,<2.6.0       # Required for PyTorch backend
 sentencepiece==0.2.0
 safetensors==0.4.4
+sentence-transformers==3.0.1
+biopython==1.85
 
 # Optional: If you want to use NLTK for preprocessing / synonym expansion
 nltk==3.9.1

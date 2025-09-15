@@ -12,11 +12,9 @@ jobs:
       packages: write
 
     steps:
-      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup Google Cloud SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
@@ -24,25 +22,39 @@ jobs:
           service_account_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
           export_default_credentials: true
 
-      # 3. Authenticate Docker with Artifact Registry
-      - name: Configure Docker auth
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+      - name: Create Artifact Registry Repository (if not exists)
+        run: |
+          gcloud artifacts repositories describe semantic-search-repo \
+            --location=us-central1 \
+            --format="value(name)" \
+            --project=${{ secrets.GCLOUD_PROJECT }} \
+            >/dev/null 2>&1 || \
+          gcloud artifacts repositories create semantic-search-repo \
+            --location=us-central1 \
+            --repository-format=docker \
+            --project=${{ secrets.GCLOUD_PROJECT }}
 
-      # 4. Build Docker image (current directory)
+      - name: Debug Verify Project ID
+        run: |
+          if [ -z "${{ secrets.GCLOUD_PROJECT }}" ]; then
+            echo "❌ ERROR: GCLOUD_PROJECT secret is empty!"
+            echo "Go to GitHub Settings > Secrets > Actions and set GCLOUD_PROJECT to your GCP Project ID (e.g., semantic-search-app-123456)"
+            exit 1
+          fi
+          echo "✅ Using Project ID: ${{ secrets.GCLOUD_PROJECT }}"
+
       - name: Build Docker image
         run: |
-          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search/semantic-search:latest .
+          docker build --platform linux/amd64 -t us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search-repo/semantic-search .
 
-      # 5. Push Docker image to Artifact Registry
-      - name: Push Docker image
+      - name: Push to Artifact Registry
         run: |
-          docker push us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search/semantic-search:latest
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search-repo/semantic-search
 
-      # 6. Deploy to Cloud Run
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy semantic-search \
-            --image us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search/semantic-search:latest \
+            --image us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search-repo/semantic-search \
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \

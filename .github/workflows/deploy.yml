@@ -12,11 +12,11 @@ jobs:
       packages: write
 
     steps:
-      # 1. Checkout the repo
+      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup Google Cloud SDK with your service account
+      # 2. Setup Google Cloud SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
@@ -24,11 +24,11 @@ jobs:
           service_account_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
           export_default_credentials: true
 
-      # 3. Configure Docker to authenticate with Artifact Registry
-      - name: Configure Docker auth for Artifact Registry
+      # 3. Authenticate Docker with Artifact Registry
+      - name: Configure Docker auth
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      # 4. Build Docker image
+      # 4. Build Docker image (current directory)
       - name: Build Docker image
         run: |
           docker build -t us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search/semantic-search:latest .

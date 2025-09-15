@@ -1,20 +1,24 @@
-# core packages
-sentencepiece==0.2.0
+--upgrade
+pip
+setuptools
+wheel
+
+# Core packages
+sentencepiece==0.2.1          # ← Fixed: 0.2.0 not available on PyPI Linux
 safetensors==0.4.4
 biopython==1.85
 Flask==3.0.3
 Flask-Cors==4.0.1
 requests==2.31.0
 
-# Prebuilt tokenizers to avoid Rust build
+# Prebuilt wheels to avoid Rust/cargo build
 tokenizers==0.19.1
 transformers==4.44.2
 
-# Torch pinned to prebuilt wheel
+# Torch pinned to prebuilt CPU wheel
 torch==2.3.1+cpu
-# if you need GPU, specify the correct CUDA version
-# torch==2.3.1+cu118
 
+# Higher-level NLP
 sentence-transformers==2.7.0
 scikit-learn==1.5.1
 nltk==3.9.1

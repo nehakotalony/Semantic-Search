@@ -12,11 +12,9 @@ jobs:
       packages: write
 
     steps:
-      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Set up Google Cloud SDK with explicit project and service account
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
@@ -24,31 +22,25 @@ jobs:
           service_account_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
           export_default_credentials: true
 
-      # 3. Verify authentication and project context (CRITICAL)
-      - name: Verify gcloud authentication
+      - name: Verify gcloud auth & project
         run: |
-          echo "=== Verifying gcloud configuration ==="
+          echo "=== Verifying environment ==="
           gcloud config set project ${{ secrets.GCLOUD_PROJECT }}
           gcloud config get-value project
           gcloud config get-value account
           gcloud auth list
 
-      # 4. Configure Docker to authenticate with Artifact Registry (explicit region)
-      - name: Configure Docker auth for Artifact Registry
-        run: |
-          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      # 5. Build Docker image (force platform to avoid buildx issues)
-      - name: Build Docker image
+      - name: Build image
         run: |
           docker build --platform linux/amd64 -t us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search/semantic-search:latest .
 
-      # 6. Push to Artifact Registry
-      - name: Push Docker image
+      - name: Push to Artifact Registry
         run: |
           docker push us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search/semantic-search:latest
 
-      # 7. Deploy to Cloud Run
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy semantic-search \

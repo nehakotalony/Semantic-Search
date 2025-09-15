@@ -1,5 +1,5 @@
 from transformers import pipeline
-summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+summarizer = pipeline("summarization", model="facebook/bart-tiny")
 
 def generate_summary(text: str) -> str:
     if not text:

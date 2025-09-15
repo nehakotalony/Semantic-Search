@@ -18,3 +18,4 @@ sentence-transformers==2.7.0
 scikit-learn==1.5.1
 nltk==3.9.1
 python-dotenv==1.0.1
+gunicorn==23.0.0

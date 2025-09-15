@@ -5,5 +5,13 @@ services:
     plan: free
     buildCommand: |
       pip install --upgrade pip setuptools wheel
-      pip install -r requirements.txt
-    startCommand: gunicorn app:app
+      pip install --only-binary=tokenizers,sentencepiece -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      # Add your secrets below (do NOT commit actual keys)
+      # - key: OPENAI_API_KEY
+      #   sync: false
+      # - key: PUBMED_API_KEY
+      #   sync: false

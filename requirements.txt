@@ -4,8 +4,15 @@ biopython==1.85
 Flask==3.0.3
 Flask-Cors==4.0.1
 requests==2.31.0
+
+# Pin tokenizers before transformers to avoid Rust build on Render
+tokenizers==0.19.1
 transformers==4.44.2
-torch>=2.5.0
+
+# Torch: avoid ">=2.5.0" (too new, no wheels on some platforms)
+# Use a stable pinned version with prebuilt wheels
+torch==2.3.1
+
 sentence-transformers==2.7.0
 scikit-learn==1.5.1
 nltk==3.9.1

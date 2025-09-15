@@ -12,11 +12,11 @@ jobs:
       packages: write
 
     steps:
-      # 1. Checkout the repo
+      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup Google Cloud SDK with your service account
+      # 2. Set up Google Cloud SDK with explicit project and service account
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
@@ -24,24 +24,26 @@ jobs:
           service_account_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
           export_default_credentials: true
 
-      # 3. Verify authentication (CRITICAL DEBUG STEP)
+      # 3. Verify authentication and project context (CRITICAL)
       - name: Verify gcloud authentication
         run: |
-          echo "=== Checking gcloud auth ==="
-          gcloud config get-value account
+          echo "=== Verifying gcloud configuration ==="
+          gcloud config set project ${{ secrets.GCLOUD_PROJECT }}
           gcloud config get-value project
+          gcloud config get-value account
           gcloud auth list
 
-      # 4. Configure Docker to authenticate with Artifact Registry
+      # 4. Configure Docker to authenticate with Artifact Registry (explicit region)
       - name: Configure Docker auth for Artifact Registry
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      # 5. Build Docker image
+      # 5. Build Docker image (force platform to avoid buildx issues)
       - name: Build Docker image
         run: |
           docker build --platform linux/amd64 -t us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search/semantic-search:latest .
 
-      # 6. Push Docker image to Artifact Registry
+      # 6. Push to Artifact Registry
       - name: Push Docker image
         run: |
           docker push us-central1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/semantic-search/semantic-search:latest
